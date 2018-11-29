@@ -203,7 +203,7 @@ send_cmd_connect
 		ld	a,$9
 		out	(c),a
 
-		ld	a,M4_C_NETCONNECT
+		ld	a,M4_C_NETCONNECT&$ff
 
 		out	(c),a
 		ld	a,M4_C_NETCONNECT>>8
@@ -285,7 +285,7 @@ M4_CMD_NET_LOOKUP_IP_send
 		ld	a,16
 		out	(c),a
 
-		ld	a,M4_C_NETHOSTIP
+		ld	a,M4_C_NETHOSTIP&$ff
 		out	(c),a
 		ld	a,M4_C_NETHOSTIP>>8
 		out	(c),a
@@ -321,7 +321,7 @@ M4_CMD_NET_RECEIVE_DATA
 		ld	a,5
 		out	(c),a
 
-		ld	a,M4_C_NETRECV
+		ld	a,M4_C_NETRECV&$ff
 		out	(c),a
 		ld	a,M4_C_NETRECV>>8
 		out	(c),a
@@ -386,7 +386,7 @@ M4_CMD_NET_SEND_CUSTOM_DATA
 		inc	a
 		out	(c),a
 
-		ld	a,M4_C_NETSEND
+		ld	a,M4_C_NETSEND&$ff
 		out	(c),a
 		ld	a,M4_C_NETSEND>>8
 		out	(c),a
@@ -412,7 +412,7 @@ M4_CMD_CLOSE_CONNECTION
 
 		out	(c),e
 
-		ld	e,M4_C_NETCLOSE
+		ld	e,M4_C_NETCLOSE&$ff
 		out	(c),e
 		ld	e,M4_C_NETCLOSE>>8
 		out	(c),e
