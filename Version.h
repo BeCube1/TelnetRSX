@@ -1,3 +1,3 @@
-MACRO Version
-	defm "241118a"
-ENDM	
+	MACRO	Version
+	defm	"241118a"
+	ENDM
