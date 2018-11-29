@@ -79,5 +79,5 @@ EndROM
  ;Padding the rom with 0s until the checksum byte
  ds #FFFF-EndROM,#00   
 
-	ORG  #FFFF
-    DEFB 0
+;;;	ORG  #FFFF
+;;;    DEFB 0
