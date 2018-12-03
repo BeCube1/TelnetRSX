@@ -8,34 +8,47 @@ M4_C_NETHOSTIP	equ	$4336
 M4_CMD_SOCKET	ld	hl,ROM_cmdsocket
 		call	M4_sendcmd
 
-		call    GetM4ROMNumber
+		call    GetM4ROMNumber			; OUT: C=ROM number
+
+		;; O: HL=Address
 
 		call    FF02_IY__Get_M4_Buffer_Response_Address
 
 		inc	hl
 		inc	hl
 		inc	hl
-		call	Read8BitFromROM
+
+		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
 		cp	255
 
 		ret
 
 FF02_IY__Get_M4_Buffer_Response_Address
 		push	af
-		ld	hl,$ff02
 		push	bc
-		call	Read16BitFromROM
+
+		ld	hl,$ff02
+		call	Read16BitFromROM		; IN: C=ROM number, HL=Address; OUT: HL=Value
+
 		pop	bc
 		pop	af
+
 		ret
+
+;;;
+;;; OUT:  HL=Socket response address
+;;;
 
 FF06_IX__Get_M4_Socket_Response_Address
 		push	af
-		ld	hl,$ff06
 		push	bc
-		call	Read16BitFromROM
+
+		ld	hl,$ff06
+		call	Read16BitFromROM		; IN: C=ROM number, HL=Address; OUT: HL=Value
+
 		pop	bc
 		pop	af
+
 		ret
 
 Clear_Z_Flag	ret
@@ -44,43 +57,62 @@ ROM_cmdsocket	defb	5
 		defw	M4_C_NETSOCKET
 		defb	$0,$0,$6
 
+;;;
+;;; IN: A=Socket, DE=Pointer to IP, ZF=Error
+;;;
 
 M4_CMD_CONNECT	ex	de,hl
 
-		call	send_cmd_connect
+		call	send_cmd_connect		; IN: A=Socket, HL=Pointer to IP
 
-		call    GetM4ROMNumber
+		call    GetM4ROMNumber			; OUT: C=ROM number
+
+		;; OUT: HL=Address
 
 		call    FF02_IY__Get_M4_Buffer_Response_Address
 
 		inc	hl
 		inc	hl
 		inc	hl
-		call	Read8BitFromROM
+
+		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
 		cp	255
+
 		ret
+
+;;;
+;;; IN: A=Socket; OUT: A=State (0=Idle, 1=Connect in progress, 2=Send in progress)
+;;;
 
 M4_GET_SOCKET_STATE
 		push	ix
 		push	hl
-		call    GetM4ROMNumber
-		call	GetSocketPtr
+
+		call    GetM4ROMNumber			; OUT: C=ROM number
+		call	GetSocketPtr			; IN: A=Socket, C=ROM number; OUT: ix=Socket prt.
 
 		push	ix
+
 		inc	ix
 		inc	ix
+
 		push	ix
 		pop	hl
-		call	Read16BitFromROM
+
+		call	Read16BitFromROM		; IN: C=ROM number, HL=Address; OUT: HL=Value
 
 		ex	de,hl
 		pop	hl
-		call	Read8BitFromROM
+		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
 
 		pop	hl
 		pop	ix
 
 		ret
+
+;;;
+;;; IN: A=Socket, C=ROM number; OUT: ix=Socket ptr.
+;;;
 
 GetSocketPtr	push	hl
 		push	de
@@ -90,6 +122,8 @@ GetSocketPtr	push	hl
 		sla	a
 		sla	a
 
+		;; IN: C=ROM number; OUT: HL=Socket response address
+
 		call 	FF06_IX__Get_M4_Socket_Response_Address
 
 		ld	e,a
@@ -97,6 +131,7 @@ GetSocketPtr	push	hl
 		add	hl,de
 		push	hl
 		pop	ix
+
 		pop	de
 		pop	hl
 
@@ -104,9 +139,12 @@ GetSocketPtr	push	hl
 
 puffermem4rsx	equ	$bf00
 
+;;;
+;;; OUT: C=ROM number
+;;;
+
 GetM4ROMNumber	push	de
 		push	hl
-
 		push	af
 
 		ld	hl,puffermem4rsx
@@ -114,76 +152,102 @@ GetM4ROMNumber	push	de
 		inc	hl
 		ld	(hl),'D'+$80
 		dec	hl
-		call	KL_FIND_COMMAND
+		call	KL_FIND_COMMAND			; OUT: HL=Address, C=ROM number
+
 		pop	af
 		pop	hl
 		pop	de
+
 		ret
+
+;;;
+;;; IN: C=ROM number, HL=Address; OUT: HL=Value
+;;;
 
 Read16BitFromROM
 		push	ix
 		push	de
 		push	bc
+
 		call	Read16BitFromROM_Main
+
 		pop	bc
 		pop	de
 		pop	ix
+
 		ret
 Read16BitFromROM_Main
 		ld	ix,$b918
 		push	ix
 		ld	ix,puffermem4rsx
 
-		ld	(ix+00),$7e
-		ld	(ix+01),$23
-		ld	(ix+02),$66
-		ld	(ix+03),$6f
-		ld	(ix+04),$c9
+		ld	(ix+00),$7e			; ld a,(hl)
+		ld	(ix+01),$23			; inc hl
+		ld	(ix+02),$66			; ld h,(hl)
+		ld	(ix+03),$6f			; ld l,a
+		ld	(ix+04),$c9			; ret
 		push	ix
 		jp	$b90f
+
+;;;
+;;; IN: C=ROM number, HL=Address; OUT: HL/DE=Value
+;;;
 
 Read32BitFromROM
 		push	ix
 		push	bc
+
 		call	Read32BitFromROM_Main
+
 		pop	bc
 		pop	ix
+
 		ret
 Read32BitFromROM_Main
 		ld	ix,$b918
 		push	ix
 		ld	ix,puffermem4rsx
 
-		ld	(ix+00),$5e
-		ld	(ix+01),$23
-		ld	(ix+02),$56
-		ld	(ix+03),$23
-		ld	(ix+04),$7e
-		ld	(ix+05),$23
-		ld	(ix+06),$66
-		ld	(ix+07),$6f
-		ld	(ix+08),$c9
+		ld	(ix+00),$5e			; ld e,(hl)
+		ld	(ix+01),$23			; inc hl
+		ld	(ix+02),$56			; ld d,(hl)
+		ld	(ix+03),$23			; inc hl
+		ld	(ix+04),$7e			; ld a,(hl)
+		ld	(ix+05),$23			; inc hl
+		ld	(ix+06),$66			; ld h,(hl)
+		ld	(ix+07),$6f			; ld l,a
+		ld	(ix+08),$c9			; ret
 		push	ix
 		jp	$b90f
+
+;;;
+;;; IN: C=ROM number, HL=Address; OUT: A=Value
+;;;
 
 Read8BitFromROM	push	ix
 		push	de
 		push	bc
+
 		call	Read8BitFromROM_Main
 
 		pop	bc
 		pop	de
 		pop	ix
-		ret
 
+		ret
 Read8BitFromROM_Main
 		ld	ix,$b918
 		push	ix
 		ld	ix,puffermem4rsx
-		ld	(ix+0),$7e
-		ld	(ix+1),$c9
+
+		ld	(ix+0),$7e			; ld a,(hl)
+		ld	(ix+1),$c9			; ret
 		push	ix
 		jp	$b90f
+
+;;;
+;;; IN: H =Packet to send
+;;;
 
 M4_sendcmd	ld	bc,$fe00
 		ld	d,(hl)
@@ -197,22 +261,27 @@ M4_sendcmd_sendloop
 		out	(c),c
 		ret
 
+;;;
+;;; IN: A=Socket, HL=Pointer to IP
+;;;
+
 send_cmd_connect
 		push	af
 		ld	bc,$fe00
+
 		ld	a,$9
 		out	(c),a
 
 		ld	a,M4_C_NETCONNECT&$ff
-
 		out	(c),a
+
 		ld	a,M4_C_NETCONNECT>>8
 		out	(c),a
 
-		pop	af
+		pop	af				; Socket
 		out	(c),a
 
-		inc	b
+		inc	b				; IP
 		outi
 		inc	b
 		outi
@@ -224,8 +293,9 @@ send_cmd_connect
 
 		ld	bc,$fe00
 
-		ld	a,23
+		ld	a,23				; Port 23
 		out	(c),a
+
 		ld	a,0
 		out	(c),a
 
@@ -233,35 +303,42 @@ send_cmd_connect
 		out	(c),c
 		ret
 
+;;;
+;;; IN: DE=Hostname, BC=size(Hostname), IX=IP address; OUT: A=0 => Ok
+;;;
+
 M4_CMD_NET_LOOKUP_IP
 		push	de
 
 		push	ix
 		pop	hl
 
-		call	M4_CMD_NET_LOOKUP_IP_send
+		call	M4_CMD_NET_LOOKUP_IP_send	; IN: HL=Hostname address
 
-		call	GetM4ROMNumber
+		call	GetM4ROMNumber			; OUT: C=ROM number
+
+		;; OUT: HL=Address
 
 		call	FF02_IY__Get_M4_Buffer_Response_Address
 
 		inc	hl
 		inc	hl
 		inc	hl
-		call	Read8BitFromROM
+		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
 		cp	1
 		jr	z,M4_CMD_NET_LOOKUP_IP_wait
+
 		pop	de
 		ld	a,1
 		ret
-
 M4_CMD_NET_LOOKUP_IP_wait
+
+		;; OUT: HL=Socket response adress
+
 		call 	FF06_IX__Get_M4_Socket_Response_Address
-
-
 M4_CMD_NET_LOOKUP_IP_wait_lookup
-		call	Read8BitFromROM
-		cp	5
+		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
+		cp	5				; IP lookup in progress.
 		jr	z,M4_CMD_NET_LOOKUP_IP_wait_lookup
 		push	af
 
@@ -270,7 +347,7 @@ M4_CMD_NET_LOOKUP_IP_wait_lookup
 		inc	hl
 		inc	hl
 
-		call	Read32BitFromROM
+		call	Read32BitFromROM		; IN: C=ROM number, HL=Address; OUT: HL/DE=Value, IX=destroyed
 		pop	af
 		pop	ix
 
@@ -280,9 +357,14 @@ M4_CMD_NET_LOOKUP_IP_wait_lookup
 		ld	(ix+3),h
 		ret
 
+;;;
+;;; IN: HL=Hostname address
+;;;
+
 M4_CMD_NET_LOOKUP_IP_send
 		ld	bc,$fe00
-		ld	a,16
+
+		ld	a,16				; String length
 		out	(c),a
 
 		ld	a,M4_C_NETHOSTIP&$ff
@@ -314,6 +396,10 @@ M4_CMD_NET_LOOKUP_IP_sendloop
 		out	(c),c
 		ret
 
+;;;
+;;; IN: A=Socket, DE=Size, IX=Pointer to Data; OUT: A=Buffer state, BC=Recv bytes count
+;;;
+
 M4_CMD_NET_RECEIVE_DATA
 		push	de
 		push	af
@@ -325,27 +411,30 @@ M4_CMD_NET_RECEIVE_DATA
 		out	(c),a
 		ld	a,M4_C_NETRECV>>8
 		out	(c),a
-		pop	af
+
+		pop	af				; Socket
 		out	(c),a
 
-		pop	de
+		pop	de				; Size
 		out	(c),e
 		out	(c),d
 
 		ld	bc,$fc00
 		out	(c),c
 
-		call    GetM4ROMNumber
+		call    GetM4ROMNumber			; OUT: C=ROM number
+
+		;; IN: C=ROM number; OUT: HL=Address
 
 		call	FF02_IY__Get_M4_Buffer_Response_Address
-		inc	hl
-		inc	hl
-		inc	hl
-		inc	hl
 
+		inc	hl
+		inc	hl
+		inc	hl
+		inc	hl
 		push	hl
 
-		call	Read16BitFromROM
+		call	Read16BitFromROM		; IN: C=ROM number, HL=Address; OUT: HL=Value
 		push	hl
 		pop	de
 
@@ -356,7 +445,7 @@ M4_CMD_NET_RECEIVE_DATA
 		push	de
 
 M4_CMD_NET_RECEIVE_DATA___TRANSFER_DATA_LOOP
-		call	Read8BitFromROM
+		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
 
 		ld	(ix),a
 		inc	ix
@@ -366,12 +455,15 @@ M4_CMD_NET_RECEIVE_DATA___TRANSFER_DATA_LOOP
 		or	e
 		jr	nz,M4_CMD_NET_RECEIVE_DATA___TRANSFER_DATA_LOOP
 
+		;; IN: C=ROM number; OUT: HL=Address
+
 		call	FF02_IY__Get_M4_Buffer_Response_Address
+
 		inc	hl
 		inc	hl
 		inc	hl
 
-		call	Read8BitFromROM
+		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
 
 		pop	bc
 
@@ -406,6 +498,11 @@ M4_CMD_NET_SEND_CUSTOM_DATA_LOOP
 		ld	bc,$fc00
 		out	(c),c
 		ret
+
+;;;
+;;; IN A=Socket
+;;;
+
 M4_CMD_CLOSE_CONNECTION
 		ld	bc,$fe00
 		ld	e,3
@@ -417,7 +514,7 @@ M4_CMD_CLOSE_CONNECTION
 		ld	e,M4_C_NETCLOSE>>8
 		out	(c),e
 
-		out	(c),a
+		out	(c),a				; Socket
 
 		ld	bc,$fc00
 		out	(c),c
