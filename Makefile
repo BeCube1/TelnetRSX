@@ -1,8 +1,8 @@
 output	= NET.rom
 
-AS	= rasm
+AS	= pasmo
 ASFLAGS	=
-OFLAG	= -ob
+OFLAG	=
 
 all: $(output)
 
