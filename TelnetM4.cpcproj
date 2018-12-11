@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<Project xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version>1.0</Version>
+  <ProjectName>Telnet</ProjectName>
+  <StartupResourceId>5</StartupResourceId>
+  <Resources>
+    <Resource>
+      <Id>3</Id>
+      <DisplayName>Test.bin</DisplayName>
+      <RelativePath>Test.bin</RelativePath>
+      <IdDependencies />
+      <IdOutputs />
+      <IsOutputResource>true</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>4</Id>
+      <DisplayName>Start.cpcdsk</DisplayName>
+      <RelativePath>Start.cpcdsk</RelativePath>
+      <IdDependencies>
+        <int>18</int>
+        <int>31</int>
+      </IdDependencies>
+      <IdOutputs>
+        <int>5</int>
+        <int>6</int>
+      </IdOutputs>
+      <IsOutputResource>false</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>5</Id>
+      <DisplayName>Start.dsk</DisplayName>
+      <RelativePath>Start.dsk</RelativePath>
+      <IdDependencies>
+        <int>4</int>
+      </IdDependencies>
+      <IdOutputs />
+      <IsOutputResource>true</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>6</Id>
+      <DisplayName>Start.filelist</DisplayName>
+      <RelativePath>Start.filelist</RelativePath>
+      <IdDependencies>
+        <int>4</int>
+      </IdDependencies>
+      <IdOutputs />
+      <IsOutputResource>true</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>7</Id>
+      <DisplayName>Start.cpcdsk.h</DisplayName>
+      <RelativePath>Start.cpcdsk.h</RelativePath>
+      <IdDependencies />
+      <IdOutputs />
+      <IsOutputResource>false</IsOutputResource>
+      <IsIncludeResource>true</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>17</Id>
+      <DisplayName>NET.asm</DisplayName>
+      <RelativePath>NET.asm</RelativePath>
+      <IdDependencies>
+        <int>21</int>
+        <int>32</int>
+      </IdDependencies>
+      <IdOutputs>
+        <int>18</int>
+      </IdOutputs>
+      <IsOutputResource>false</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>18</Id>
+      <DisplayName>NET.bin</DisplayName>
+      <RelativePath>NET.bin</RelativePath>
+      <IdDependencies>
+        <int>17</int>
+      </IdDependencies>
+      <IdOutputs />
+      <IsOutputResource>true</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>21</Id>
+      <DisplayName>Version.h</DisplayName>
+      <RelativePath>Version.h</RelativePath>
+      <IdDependencies />
+      <IdOutputs />
+      <IsOutputResource>false</IsOutputResource>
+      <IsIncludeResource>true</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>30</Id>
+      <DisplayName>TelnetDuke.asm</DisplayName>
+      <RelativePath>TelnetDuke.asm</RelativePath>
+      <IdDependencies />
+      <IdOutputs>
+        <int>31</int>
+      </IdOutputs>
+      <IsOutputResource>false</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>31</Id>
+      <DisplayName>TelnetDuke.bin</DisplayName>
+      <RelativePath>TelnetDuke.bin</RelativePath>
+      <IdDependencies>
+        <int>30</int>
+      </IdDependencies>
+      <IdOutputs />
+      <IsOutputResource>true</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>32</Id>
+      <DisplayName>M4Driver.asm</DisplayName>
+      <RelativePath>M4Driver.asm</RelativePath>
+      <IdDependencies />
+      <IdOutputs>
+        <int>33</int>
+      </IdOutputs>
+      <IsOutputResource>false</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+    <Resource>
+      <Id>33</Id>
+      <DisplayName>M4Driver.bin</DisplayName>
+      <RelativePath>M4Driver.bin</RelativePath>
+      <IdDependencies>
+        <int>32</int>
+      </IdDependencies>
+      <IdOutputs />
+      <IsOutputResource>true</IsOutputResource>
+      <IsIncludeResource>false</IsIncludeResource>
+    </Resource>
+  </Resources>
+  <TreeNode>
+    <IsFolder>false</IsFolder>
+    <FolderName />
+    <ResourceId>0</ResourceId>
+    <ChildNodes>
+      <Node>
+        <IsFolder>true</IsFolder>
+        <FolderName>Source</FolderName>
+        <ResourceId>0</ResourceId>
+        <ChildNodes>
+          <Node>
+            <IsFolder>false</IsFolder>
+            <FolderName />
+            <ResourceId>17</ResourceId>
+            <ChildNodes />
+            <Expanded>true</Expanded>
+          </Node>
+          <Node>
+            <IsFolder>false</IsFolder>
+            <FolderName />
+            <ResourceId>21</ResourceId>
+            <ChildNodes />
+            <Expanded>false</Expanded>
+          </Node>
+          <Node>
+            <IsFolder>false</IsFolder>
+            <FolderName />
+            <ResourceId>30</ResourceId>
+            <ChildNodes />
+            <Expanded>true</Expanded>
+          </Node>
+          <Node>
+            <IsFolder>false</IsFolder>
+            <FolderName />
+            <ResourceId>32</ResourceId>
+            <ChildNodes />
+            <Expanded>true</Expanded>
+          </Node>
+        </ChildNodes>
+        <Expanded>true</Expanded>
+      </Node>
+      <Node>
+        <IsFolder>true</IsFolder>
+        <FolderName>Output</FolderName>
+        <ResourceId>0</ResourceId>
+        <ChildNodes>
+          <Node>
+            <IsFolder>false</IsFolder>
+            <FolderName />
+            <ResourceId>4</ResourceId>
+            <ChildNodes />
+            <Expanded>true</Expanded>
+          </Node>
+          <Node>
+            <IsFolder>false</IsFolder>
+            <FolderName />
+            <ResourceId>7</ResourceId>
+            <ChildNodes />
+            <Expanded>false</Expanded>
+          </Node>
+        </ChildNodes>
+        <Expanded>true</Expanded>
+      </Node>
+    </ChildNodes>
+    <Expanded>true</Expanded>
+  </TreeNode>
+  <ResourceId>35</ResourceId>
+  <GlobalSettings>
+    <Screen1_TopScreenPtr>128</Screen1_TopScreenPtr>
+    <Screen1_BottomScreenPtr>16384</Screen1_BottomScreenPtr>
+    <Screen1_TopHeightInChars>20</Screen1_TopHeightInChars>
+    <Screen1_BottomHeightInChars>21</Screen1_BottomHeightInChars>
+    <CRTC_Register1>48</CRTC_Register1>
+    <CRTC_Register6>41</CRTC_Register6>
+    <CRTC_Register9>4</CRTC_Register9>
+  </GlobalSettings>
+</Project>
