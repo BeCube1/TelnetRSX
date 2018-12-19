@@ -7,50 +7,50 @@
 			; to easily cross compile and test quick on real CPC
 
 			
-puffermem equ #bf00
-KL_FIND_COMMAND	equ #bcd4
-org #0170
-db #0a,#00,#0a,#00,#83,#20,#1c,#80,#01,#00		; Call #180
+puffermem equ $bf00
+KL_FIND_COMMAND	equ $bcd4
+org $0170
+db $0a,$00,$0a,$00,$83,$20,$1c,$80,$01,$00		; Call $180
 
-org #180
+org $180
 ;	ld c,6
-;	call #B90F ;KL_ROM_SELECT
+;	call $B90F ;KL_ROM_SELECT
 			
-;			org	0x1000
+;			org	$1000
 ;			nolist
 			
-DATAPORT		equ 0xFE00
-ACKPORT			equ 0xFC00			
+DATAPORT		equ $FE00
+ACKPORT			equ $FC00			
 
 ; m4 commands used
-C_NETSOCKET		equ 0x4331
-C_NETCONNECT	equ 0x4332
-C_NETCLOSE		equ 0x4333
-C_NETSEND		equ 0x4334
-C_NETRECV		equ 0x4335
-C_NETHOSTIP		equ 0x4336
+C_NETSOCKET		equ $4331
+C_NETCONNECT	equ $4332
+C_NETCLOSE		equ $4333
+C_NETSEND		equ $4334
+C_NETRECV		equ $4335
+C_NETHOSTIP		equ $4336
 
 ; firmware functions used
-km_read_char	equ	0xBB09
-km_wait_key		equ	0xBB18
-txt_output		equ 0xBB5A
-txt_set_column	equ 0xBB6F
-txt_set_row		equ 0xBB72
-txt_set_cursor	equ	0xBB75
-txt_get_cursor	equ	0xBB78
-txt_cur_on		equ	0xBB81
-scr_reset		equ	0xBC0E
-scr_set_ink		equ	0xBC32
-scr_set_border	equ	0xBC38
-mc_wait_flyback	equ	0xBD19
-kl_rom_select	equ 0xb90f
+km_read_char	equ	$BB09
+km_wait_key		equ	$BB18
+txt_output		equ $BB5A
+txt_set_column	equ $BB6F
+txt_set_row		equ $BB72
+txt_set_cursor	equ	$BB75
+txt_get_cursor	equ	$BB78
+txt_cur_on		equ	$BB81
+scr_reset		equ	$BC0E
+scr_set_ink		equ	$BC32
+scr_set_border	equ	$BC38
+mc_wait_flyback	equ	$BD19
+kl_rom_select	equ $b90f
 
 ; telnet negotiation codes
-DO 				equ 0xfd
-WONT 			equ 0xfc
-WILL 			equ 0xfb
-DONT 			equ 0xfe
-CMD 			equ 0xff
+DO 				equ $fd
+WONT 			equ $fc
+WILL 			equ $fb
+DONT 			equ $fe
+CMD 			equ $ff
 CMD_ECHO 		equ 1
 CMD_WINDOW_SIZE equ 31
 			
@@ -83,9 +83,9 @@ start:		ld		a,2
 			; find rom M4 rom number
 			
 			ld		a,(m4_rom_num)
-			cp		0xFF
+			cp		$FF
 			call	z,find_m4_rom	
-			cp		0xFF
+			cp		$FF
 			jr		nz, found_m4
 			
 			ld		hl,msgnom4
@@ -94,10 +94,10 @@ start:		ld		a,2
 			
 found_m4:	ld		hl,msgfoundm4
 			call	disptextz
-			ld		hl,(0xFF00)	; get version
+			ld		hl,($FF00)	; get version
 			ld		a,h
 			call	print_lownib
-			ld		a,0x2E
+			ld		a,$2E
 			call	txt_output
 			ld		a,l
 			rr		a
@@ -105,14 +105,14 @@ found_m4:	ld		hl,msgfoundm4
 			rr		a
 			rr		a
 			call	print_lownib
-			ld		a,0x2E
+			ld		a,$2E
 			call	txt_output
 			ld		a,l
 			call	print_lownib
 			
 			; compare version
 			
-			ld		de,0x110		; v1.1.0 lowest version required
+			ld		de,$110		; v1.1.0 lowest version required
 			ld 		a,h
 			xor		d
 			jp		m,cmpgte2
@@ -158,7 +158,7 @@ exit:
 			jp		km_wait_key
 
 print_lownib:			
-			and		0xF			; keep lower nibble
+			and		$F			; keep lower nibble
 			add		a,48			; 0 + x = neric ascii
 			jp		txt_output
 			
@@ -166,7 +166,7 @@ get_server:
 			ld		hl,buf
 			call	get_textinput
 			
-			;cp		0xFC			; ESC?
+			;cp		$FC			; ESC?
 			;ret		z
 			xor		a
 			cp		c
@@ -238,7 +238,7 @@ lookup_ok:	push	hl			; contains port "offset"
 			call	disptextz
 			
 			; copy IP from socket 0 info
-			ld		hl,(0xFF06)
+			ld		hl,($FF06)
 			ld		de,4
 			add		hl,de
 			ld		de,ip_addr
@@ -261,7 +261,7 @@ convert_ip:
 			ld		(ip_addr),a
 			dec		hl
 check_port:	ld		a,(hl)
-			cp		0x3A		; any ':' for port number ?
+			cp		$3A		; any ':' for port number ?
 			jr		nz, no_port
 			
 			push	hl
@@ -279,11 +279,11 @@ got_port:
 ; ------------------------------------------------------------------------------
 
 dnslookup:	; OUT   A=0 => All OK
-			ld		hl,(0xFF02)	; get response buffer address
+			ld		hl,($FF02)	; get response buffer address
 			push	hl
 			pop		iy
 			
-			ld		hl,(0xFF06)	; get sock info
+			ld		hl,($FF06)	; get sock info
 			push	hl
 			pop		ix		; ix ptr to current socket status			
 			
@@ -317,7 +317,7 @@ dnslookup:	; OUT   A=0 => All OK
 			; M4 rom should be mapped as upper rom.
 			
 telnet_session:	
-			ld		hl,(0xFF02)	; get response buffer address
+			ld		hl,($FF02)	; get response buffer address
 			push	hl
 			pop		iy
 			
@@ -347,7 +347,7 @@ telnet_session:
 			sla		a
 			sla		a
 			
-			ld		hl,(0xFF06)	; get sock info
+			ld		hl,($FF06)	; get sock info
 			ld		e,a
 			ld		d,0
 			add		hl,de	; sockinfo + (socket*4)
@@ -388,20 +388,20 @@ mainloop:	ld		bc,1
 			
 			call	km_read_char
 			jr		nc,mainloop
-			cp		0xFC			; ESC?
+			cp		$FC			; ESC?
 			jp		z, exit_close	
-			cp		0x9				; TAB?
+			cp		$9				; TAB?
 			jr		nz, no_pause
 wait_no_tab:
 			call	km_read_char
-			cp		0x9
+			cp		$9
 			jr		z, wait_no_tab
 			
 pause_loop:			
 			call	km_read_char
-			cp		0xFC			; ESC?
+			cp		$FC			; ESC?
 			jp		z, exit_close	
-			cp		0x9				; TAB again to leave
+			cp		$9				; TAB again to leave
 			jr		nz, pause_loop
 			jr		mainloop
 no_pause:
@@ -427,10 +427,10 @@ wait_send:
 			
 			ld		a,(hl)
 			;call	txt_output
-			cp		0xD
+			cp		$D
 			jr		nz, plain_text
 			inc		hl
-			ld		a,0xA
+			ld		a,$A
 			;call	txt_output
 			ld		(hl),a
 			
@@ -442,16 +442,16 @@ wait_send:
 ;			call	sendcmd
 			ld a,(rsocket)
 			ld ix,cmdsend
-			ld ix,#4000
+			ld ix,$4000
 			ld (ix+0),5		; Size								
 			ld (ix+1),a
-			ld (ix+2),#01	; Sendsize
-			ld (ix+3),#00	; Sendsize			
+			ld (ix+2),$01	; Sendsize
+			ld (ix+3),$00	; Sendsize			
 			ld a,(sendtext)
 			ld (ix+4),a
 			ld a,(sendtext+1)
 			ld (ix+5),a			
-			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data (#00:Length, #01:Socketnumber, #02-#9999:Data)   OUT   nothing
+			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data ($00:Length, $01:Socketnumber, $02-$9999:Data)   OUT   nothing
 
 			jp		mainloop
 			
@@ -466,27 +466,27 @@ plain_text:
 			; negotiate window size
 			ld a,(rsocket)
 			ld ix,cmdsend
-			ld ix,#4000
+			ld ix,$4000
 			ld (ix+0),4		; Size								
 			ld (ix+1),a
-			ld (ix+2),#01	; Sendsize
-			ld (ix+3),#00	; Sendsize			
+			ld (ix+2),$01	; Sendsize
+			ld (ix+3),$00	; Sendsize			
 			ld a,(sendtext)
 			ld (ix+4),a
-			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data (#00:Length, #01:Socketnumber, #02-#9999:Data)   OUT   nothing
+			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data ($00:Length, $01:Socketnumber, $02-$9999:Data)   OUT   nothing
 			
 			
 			
 			jp		mainloop
 
 
-			; call when CMD (0xFF) detected, read next two bytes of command
+			; call when CMD ($FF) detected, read next two bytes of command
 			; IY = socket structure ptr
 negotiate:
 		
 			ld		bc,2
 			call	recv
-			cp		0xFF
+			cp		$FF
 			jp		z, exit_close	
 			cp		3
 			jp		z, exit_close
@@ -502,7 +502,7 @@ check_negotiate:
 ;		ld iy,NetReadDataBuf-3			;#######			
 			
 			ld		a,(iy+6)
-			cp		0xFD	; DO
+			cp		$FD	; DO
 			jp		nz, will_not
 			ld		a,(iy+7)
 			cp		CMD_WINDOW_SIZE	
@@ -517,15 +517,15 @@ goon0
 			; negotiate window size
 			ld a,(rsocket)
 			ld ix,cmdsend
-			ld ix,#4000
+			ld ix,$4000
 			ld (ix+0),6		; Size								
 			ld (ix+1),a
-			ld (ix+2),#03	; Sendsize
-			ld (ix+3),#00	; Sendsize			
-			ld (ix+4),#FF		; CMD
-			ld (ix+5),#FB		; WILL
+			ld (ix+2),$03	; Sendsize
+			ld (ix+3),$00	; Sendsize			
+			ld (ix+4),$FF		; CMD
+			ld (ix+5),$FB		; WILL
 			ld (ix+6),CMD_WINDOW_SIZE
-			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data (#00:Length, #01:Socketnumber, #02-#9999:Data)   OUT   nothing
+			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data ($00:Length, $01:Socketnumber, $02-$9999:Data)   OUT   nothing
 
 			pop hl
 			pop iy
@@ -542,13 +542,13 @@ _wait_sendxxx
 		
 			ld a,(rsocket)
 			ld ix,cmdsend
-			ld ix,#4000
+			ld ix,$4000
 			ld (ix+0),12		; Size
 			ld (ix+1),a
 			ld (ix+2),9	; Sendsize
 			ld (ix+3),0	; Sendsize			
-			ld (ix+4),0xFF		; CMD
-			ld (ix+5),0xFA		; SB sub negotiation
+			ld (ix+4),$FF		; CMD
+			ld (ix+5),$FA		; SB sub negotiation
 			ld (ix+6),CMD_WINDOW_SIZE			
 			ld (ix+7),0
 			ld (ix+8),80			
@@ -558,7 +558,7 @@ _wait_sendxxx
 			ld (ix+12),240		; End of subnegotiation parameters.
 
 			
-			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data (#00:Length, #01:Socketnumber, #02-#9999:Data)   OUT   nothing
+			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data ($00:Length, $01:Socketnumber, $02-$9999:Data)   OUT   nothing
 			ret
 			
 
@@ -566,30 +566,30 @@ _wait_sendxxx
 will_not:
 			
 			ld		a,(iy+6)
-			cp		0xFD			; DO
+			cp		$FD			; DO
 			jr		nz, not_do
-			ld		a,0xFC			; WONT
+			ld		a,$FC			; WONT
 			jr		next_telcmd
-not_do:		cp		0xFC			; WILL
+not_do:		cp		$FC			; WILL
 			jr		nz, next_telcmd
-			ld		a,0xFD			; DO
+			ld		a,$FD			; DO
 
 next_telcmd:
 			push af
 			ld a,(rsocket)
 			ld ix,cmdsend
-			ld ix,#4000
+			ld ix,$4000
 			ld (ix+0),6		; Size
 			ld (ix+1),a
 			ld (ix+2),3	; Sendsize
 			ld (ix+3),0	; Sendsize			
-			ld (ix+4),0xFF		; CMD
+			ld (ix+4),$FF		; CMD
 			pop af
 			ld (ix+5),a
 			ld	a,(iy+7)
 			ld (ix+6),a
 			
-			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data (#00:Length, #01:Socketnumber, #02-#9999:Data)   OUT   nothing
+			call 	RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data ($00:Length, $01:Socketnumber, $02-$9999:Data)   OUT   nothing
 			ret
 
 
@@ -607,7 +607,7 @@ recv_noblock:
 			ld		bc,1
 			
 			call 	recv
-			cp		0xFF
+			cp		$FF
 			jp		z, exit_close	
 			cp		3
 			jp		z, exit_close
@@ -625,7 +625,7 @@ got_msg2:
 			; disp received msg
 			push	iy
 			pop		hl
-			ld		de,0x6
+			ld		de,$6
 			add		hl,de		; received text pointer
 		ld hl,NetReadDataBuf			;#######	
 			ld		a,(hl)
@@ -638,7 +638,7 @@ got_msg2:
 			
 not_tel_cmd:
 			ld		b,a
-			cp		0x1B		; escape code sequence?
+			cp		$1B		; escape code sequence?
 			jr		nz, notescapeCode
 			ld		(isEscapeCode),a
 			xor		a
@@ -656,7 +656,7 @@ notescapeCode:
 			add		hl,de
 			ld		(EscapeCount),a
 			cp		1
-			jp		z, skip_check_esc_code	; we only want 0x1B,'[' ... for now
+			jp		z, skip_check_esc_code	; we only want $1B,'[' ... for now
 			ld		a,(hl)
 			
 			cp		'A'					; cursor up
@@ -778,14 +778,14 @@ skip_check_esc_code:
 			; filter out unsused sequences
 			
 			; upper case
-			cp		0x41
+			cp		$41
 			jr		c, recvdone			; less than
-			cp		0x5A
+			cp		$5A
 			jr		c, isok2
 			; check lower case
-			cp		0x61
+			cp		$61
 			jr		c, recvdone			; less than
-			cp		0x7A
+			cp		$7A
 			jr		nc, recvdone
 		
 isok2:
@@ -911,10 +911,10 @@ find_m4_rom:
 romloop:	push	de
 			ld		c,d
 			call	kl_rom_select		; system/interrupt friendly
-			ld		a,(0xC000)
+			ld		a,($C000)
 			cp		1
 			jr		nz, not_this_rom
-			ld		hl,(0xC004)	; get rsxcommand_table
+			ld		hl,($C004)	; get rsxcommand_table
 			push	iy
 			pop		de
 cmp_loop:
@@ -932,7 +932,7 @@ match_char:
 			ld		a,(de)
 			inc		hl
 			inc		de
-			and		0x80
+			and		$80
 			jr		z,cmp_loop
 			
 			; rom found, store the rom number
@@ -948,14 +948,14 @@ match_char:
 ;			; HL = packet to send
 ;			;
 ;sendcmd:
-;			ld		bc,0xFE00
+;			ld		bc,$FE00
 ;			ld		d,(hl)
 ;			inc		d
 ;sendloop:	inc		b
 ;			outi
 ;			dec		d
 ;			jr		nz,sendloop
-;			ld		bc,0xFC00
+;			ld		bc,$FC00
 ;			out		(c),c
 ;			ret
 ; ------------------------------------------------------------------------------					
@@ -996,7 +996,7 @@ disp_error:
 			jr		nz, not_rc3
 			ld		hl,msgconnclosed
 			jp		disptextz
-not_rc3:	cp		0xFC
+not_rc3:	cp		$FC
 			jr		nz,notuser
 			ld		hl,msguserabort
 			jp		disptextz
@@ -1011,16 +1011,16 @@ notuser:
 			srl		a
 			srl		a
 			srl		a
-			add		a,0x90
+			add		a,$90
 			daa
-			adc		a,0x40
+			adc		a,$40
 			daa
 			call	txt_output
 			ld		a,b
-			and		0x0f
-			add		a,0x90
+			and		$0f
+			add		a,$90
 			daa
-			adc		a,0x40
+			adc		a,$40
 			daa
 			call	txt_output
 			ld		a,10
@@ -1033,16 +1033,16 @@ disphex:	ld		b,a
 			srl		a
 			srl		a
 			srl		a
-			add		a,0x90
+			add		a,$90
 			daa
-			adc		a,0x40
+			adc		a,$40
 			daa
 			call	txt_output
 			ld		a,b
-			and		0x0f
-			add		a,0x90
+			and		$0f
+			add		a,$90
 			daa
-			adc		a,0x40
+			adc		a,$40
 			daa
 			call	txt_output
 			ld		a,32
@@ -1065,7 +1065,7 @@ re:			call	mc_wait_flyback
 			call	km_read_char
 			jr		nc,re
 
-			cp		0x7F
+			cp		$7F
 			jr		nz, not_delkey
 			ld		a,c
 			cp		0
@@ -1088,11 +1088,11 @@ re:			call	mc_wait_flyback
 not_delkey:	
 			cp		13
 			jr		z, terminate
-			cp		0xFC
+			cp		$FC
 			ret		z
 			cp		32
 			jr		c, inputloop
-			cp		0x7e
+			cp		$7e
 			jr		nc, inputloop
 			ld		(hl),a
 			inc		hl
@@ -1130,7 +1130,7 @@ re2:		call	mc_wait_flyback
 			call	km_read_char
 			jr		nc,re2
 
-			cp		0x7F
+			cp		$7F
 			jr		nz, not_delkey2
 			ld		a,c
 			cp		0
@@ -1153,7 +1153,7 @@ re2:		call	mc_wait_flyback
 not_delkey2:	
 			cp		13
 			jr		z, enterkey2
-			cp		0xFC
+			cp		$FC
 			ret		z
 			cp		46				; less than '.'
 			jr		c, inputloop2
@@ -1198,7 +1198,7 @@ disp_ip_loop:
 			pop		bc
 			pop		hl
 			dec		hl
-			ld		a,0x2e
+			ld		a,$2e
 			call	txt_output
 			djnz	disp_ip_loop
 			
@@ -1250,7 +1250,7 @@ count_digits:
 			jr		nz,count_digits
 			dec		ix
 			ld		a,(ix)
-			cp		0x3A
+			cp		$3A
 			ret		z
 			sub		48
 			ld		l,a			; *1
@@ -1259,7 +1259,7 @@ count_digits:
 			
 			dec		ix
 			ld		a,(ix)
-			cp		0x3A
+			cp		$3A
 			ret		z
 			sub		48
 
@@ -1272,7 +1272,7 @@ count_digits:
 			add		hl,de		
 			dec		ix
 			ld		a,(ix)
-			cp		0x3A
+			cp		$3A
 			ret		z
 			sub		48
 			
@@ -1285,7 +1285,7 @@ count_digits:
 			add		hl,de		
 			dec		ix
 			ld		a,(ix)
-			cp		0x3A
+			cp		$3A
 			ret		z
 			sub		48
 			
@@ -1298,7 +1298,7 @@ count_digits:
 			add		hl,de		
 			dec		ix
 			ld		a,(ix)
-			cp		0x3A
+			cp		$3A
 			ret		z
 			sub		48
 			
@@ -1315,18 +1315,18 @@ ascii2dec:	ld		d,0
 loop2e:		ld		a,(hl)
 			cp		0
 			jr		z,found2e
-			cp		0x3A		; ':' port seperator ?
+			cp		$3A		; ':' port seperator ?
  			jr		z,found2e
 			
-			cp		0x2e
+			cp		$2e
 			jr		z,found2e
 			; convert to decimal
-			cp		0x41	; a ?
+			cp		$41	; a ?
 			jr		nc,less_than_a
-			sub		0x30	; - '0'
+			sub		$30	; - '0'
 			jr		next_dec
 less_than_a:	
-			sub		0x37	; - ('A'-10)
+			sub		$37	; - ('A'-10)
 next_dec:		
 			ld		(hl),a
 			inc		hl
@@ -1388,12 +1388,12 @@ has_value:	ld		d,0
 			ld		e,a
 dec_loop2:
 			ld		a,(hl)
-			cp		0x41	; a ?
+			cp		$41	; a ?
 			jr		nc,less_than_a2
-			sub		0x30	; - '0'
+			sub		$30	; - '0'
 			jr		next_dec2
 less_than_a2:	
-			sub		0x37	; - ('A'-10)
+			sub		$37	; - ('A'-10)
 next_dec2:	inc	hl
 			cp	0
 			jr	nz, do_mul
@@ -1495,7 +1495,7 @@ msgtitle2:		db  "=========================================",0
 msguserabort:	db	10,13,"User aborted (ESC)", 10, 13,0
 cmdsocket:		db	5
 				dw	C_NETSOCKET
-				db	0x0,0x0,0x6		; domain, type, protocol (TCP/IP)
+				db	$0,$0,$6		; domain, type, protocol (TCP/IP)
 
 cmdconnect:		db	9	
 				dw	C_NETCONNECT
@@ -1509,9 +1509,9 @@ sendsock:		db	0
 sendsize:		dw	0			; size
 sendtext:		ds	255
 			
-cmdclose:		db	0x03
+cmdclose:		db	$03
 				dw	C_NETCLOSE
-clsocket:		db	0x0
+clsocket:		db	$0
 
 cmdlookup:		db	16
 				dw	C_NETHOSTIP
@@ -1519,11 +1519,11 @@ lookup_name:	ds	128
 
 cmdrecv:		db	5
 				dw	C_NETRECV	; recv
-rsocket:		db	0x0			; socket
+rsocket:		db	$0			; socket
 rsize:			dw	2048		; size
 			
-m4_rom_name:	db "M4 BOAR",0xC4		; D | 0x80
-m4_rom_num:	db	0xFF
+m4_rom_name:	db "M4 BOAR",$C4		; D | $80
+m4_rom_num:	db	$FF
 curPos:			dw	0
 isEscapeCode:	db	0
 EscapeCount:	db	0
@@ -1540,69 +1540,69 @@ RSX_CMD_NET_LOOKUP_IP
 	push hl
 	push bc
 ;ld hl,M4_CMD_NET_LOOKUP_IP
-;jp 	RSX_JUMPTORAM_AND_EXIT	; call #1b: pop bc : pop hl : ret	
+;jp 	RSX_JUMPTORAM_AND_EXIT	; call $1b: pop bc : pop hl : ret	
 
 	ld hl,puffermem
-	ld (hl),#95
+	ld (hl),$95
 	push de
 	call KL_FIND_COMMAND		; OUT: HL=Adress, C=ROM-Number
 	pop de
-	jr 	RSX_JUMPTOROM_AND_EXIT	; call #1b: pop bc : pop hl : ret
+	jr 	RSX_JUMPTOROM_AND_EXIT	; call $1b: pop bc : pop hl : ret
 
 ; ---------------------------
 RSX_CMD_SOCKET
 	push hl
 	push bc
 ;ld hl,M4_CMD_SOCKET
-;jr 	RSX_JUMPTORAM_AND_EXIT	; call #1b: pop bc : pop hl : ret	
+;jr 	RSX_JUMPTORAM_AND_EXIT	; call $1b: pop bc : pop hl : ret	
 
 	ld hl,puffermem
-	ld (hl),#91
+	ld (hl),$91
 	call KL_FIND_COMMAND		; OUT: HL=Adress, C=ROM-Number
-	jr 	RSX_JUMPTOROM_AND_EXIT	; call #1b: pop bc : pop hl : ret
+	jr 	RSX_JUMPTOROM_AND_EXIT	; call $1b: pop bc : pop hl : ret
 ; ---------------------------
 
 RSX_CMD_CONNECT
 	push hl
 	push bc
 ;ld hl,M4_CMD_CONNECT
-;jr 	RSX_JUMPTORAM_AND_EXIT	; call #1b: pop bc : pop hl : ret	
+;jr 	RSX_JUMPTORAM_AND_EXIT	; call $1b: pop bc : pop hl : ret	
 	
 	push af
 	push de
 	ld hl,puffermem
-	ld (hl),#92
+	ld (hl),$92
 	call KL_FIND_COMMAND		; OUT: HL=Adress, C=ROM-Number
 	pop de
 	pop af
-	jr 	RSX_JUMPTOROM_AND_EXIT	; call #1b: pop bc : pop hl : ret
+	jr 	RSX_JUMPTOROM_AND_EXIT	; call $1b: pop bc : pop hl : ret
 ; ---------------------------
 	
 RSX_CMD_GET_SOCKET_STATE
 	push hl
 	push bc
 ;ld hl,M4_GET_SOCKET_STATE
-;jr 	RSX_JUMPTORAM_AND_EXIT	; call #1b: pop bc : pop hl : ret	
+;jr 	RSX_JUMPTORAM_AND_EXIT	; call $1b: pop bc : pop hl : ret	
 	push af
 	ld hl,puffermem
-	ld (hl),#93
+	ld (hl),$93
 	call KL_FIND_COMMAND		; OUT: HL=Adress, C=ROM-Number
 	pop af
 	
-	jr 	RSX_JUMPTOROM_AND_EXIT	; call #1b: pop bc : pop hl : ret
+	jr 	RSX_JUMPTOROM_AND_EXIT	; call $1b: pop bc : pop hl : ret
 
 ; ---------------------------
-RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data (#00:Length, #01:Socketnumber, #02-#9999:Data)   OUT   nothing
+RSX_CMD_NET_SEND_CUSTOM_DATA	; IN IX=Pointer to Data ($00:Length, $01:Socketnumber, $02-$9999:Data)   OUT   nothing
 	push hl
 	push bc
 ;ld hl,M4_CMD_NET_SEND_CUSTOM_DATA
-;jr 	RSX_JUMPTORAM_AND_EXIT	; call #1b: pop bc : pop hl : ret		
+;jr 	RSX_JUMPTORAM_AND_EXIT	; call $1b: pop bc : pop hl : ret		
 	push ix
 	ld hl,puffermem
-	ld (hl),#96
+	ld (hl),$96
 	call KL_FIND_COMMAND		; OUT: HL=Adress, C=ROM-Number
 	pop ix
-	jr 	RSX_JUMPTOROM_AND_EXIT	; call #1b: pop bc : pop hl : ret
+	jr 	RSX_JUMPTOROM_AND_EXIT	; call $1b: pop bc : pop hl : ret
 	
 ; ---------------------------
 
@@ -1612,13 +1612,13 @@ RSX_CMD_CLOSE_CONNECTION; IN A= Socket
 	push hl
 	push bc
 ;ld hl,M4_CMD_CLOSE_CONNECTION
-;jr 	RSX_JUMPTORAM_AND_EXIT	; call #1b: pop bc : pop hl : ret		
+;jr 	RSX_JUMPTORAM_AND_EXIT	; call $1b: pop bc : pop hl : ret		
 	push ix
 	ld hl,puffermem
-	ld (hl),#97
+	ld (hl),$97
 	call KL_FIND_COMMAND		; OUT: HL=Adress, C=ROM-Number
 	pop ix
-	jr 	RSX_JUMPTOROM_AND_EXIT	; call #1b: pop bc : pop hl : ret
+	jr 	RSX_JUMPTOROM_AND_EXIT	; call $1b: pop bc : pop hl : ret
 	
 	
 ; ---------------------------
@@ -1627,13 +1627,13 @@ RSX_CMD_NET_RECEIVE_DATA
 	push hl
 	push bc
 ;ld hl,M4_CMD_NET_RECEIVE_DATA
-;jr 	RSX_JUMPTORAM_AND_EXIT	; call #1b: pop bc : pop hl : ret		
+;jr 	RSX_JUMPTORAM_AND_EXIT	; call $1b: pop bc : pop hl : ret		
 	
 	push af
 	push de
 	push ix
 	ld hl,puffermem
-	ld (hl),#94
+	ld (hl),$94
 	call KL_FIND_COMMAND		; OUT: HL=Adress, C=ROM-Number
 	pop ix
 	pop de
@@ -1643,7 +1643,7 @@ RSX_CMD_NET_RECEIVE_DATA
 
 
 RSX_JUMPTOROM_AND_EXIT:	
-	call #1b
+	call $1b
 	
 	pop bc
 	pop hl
@@ -1651,7 +1651,7 @@ RSX_JUMPTOROM_AND_EXIT:
 
 
 ;RSX_JUMPTORAM_AND_EXIT
-;	call #1e	; jp HL
+;	call $1e	; jp HL
 ;	pop bc
 ;	pop hl
 ;	ret
